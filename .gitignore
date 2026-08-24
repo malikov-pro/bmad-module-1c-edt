@@ -5,6 +5,7 @@ _bmad-output/
 
 # Апстрим-источники слоёв стека (shallow-клоны для чтения, не исходники модуля)
 _sources/
+docs/
 
 # Python
 __pycache__/
