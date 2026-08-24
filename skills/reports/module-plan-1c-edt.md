@@ -1,16 +1,16 @@
 ---
 title: 'Module Plan'
-status: 'ideation'
+status: 'complete'
 module_name: '1C EDT'
 module_code: 'e1c'
 module_description: 'Правила работы с 1С в BMAD через EDT-MCP: читать и менять конфигурацию только через MCP, считать работу сделанной по зелёному EDT.'
-architecture: ''
+architecture: 'stack-layer'
 standalone: false
 expands_module: 'bmm'
-skills_planned: []
-config_variables: []
+skills_planned: ['e1c-core', 'e1c-setup', 'e1c-bsl-practices', 'e1c-metadata-forms', 'e1c-testing-yaxunit', 'e1c-review', 'e1c-updater']
+config_variables: ['edt_mcp_min_version', 'rules_lang']
 created: '2026-08-24T16:07:00+05:00'
-updated: '2026-08-24T23:30:00+05:00'
+updated: '2026-08-25T00:30:00+05:00'
 ---
 
 # Module Plan
@@ -109,6 +109,18 @@ updated: '2026-08-24T23:30:00+05:00'
 - **Content:** требование расширения [YAxUnit](https://github.com/bia-technologies/yaxunit) в целевой ИБ (нет расширения → честный отказ, не «тесты прошли»); запуск `run_yaxunit_tests` (JUnit Markdown); принципы изоляции тестов (конвертировано из SteelMorgan: нулевой остаток данных, изоляция прогонов); связь с AC стори BMAD.
 - **Relationships:** требует `e1c-core`; замыкает контур «EDT зелёный».
 
+### e1c-review (knowledge)
+
+- **Purpose:** ревью 1С-изменений только на чтение — 1С-линза для существующего `bmad-code-review`, **не замена** ему: BMAD-скилл ведёт процесс ревью, `e1c-review` даёт доменную методику сбора доказательств и рубрику.
+- **Capabilities:**
+  1. *Сбор evidence (read-only)* — вход: перечень затронутых объектов из стори/отчёта build; выход: `get_project_errors` (фильтры проект/серьёзность), `get_problem_summary`, `read_method_source`/`get_module_structure`, просмотр метаданных.
+  2. *Проверка по рубрике* — находки по категориям: стандарты BSL, транзакционные границы, билингвальность Name/Synonym, перехватчики расширений (`ПродолжитьВызов`, маркеры), состав форм.
+  3. *Вердикт по «зелёному»* — подтверждён/не подтверждён критерий done стори (ошибки EDT чистые + результаты YAxUnit из отчёта build).
+  4. *Граница режима* — фиксирует фактическую видимость инструментов («Analysis Only»); write-инструменты не использует даже при видимости и рекомендует включить Analysis Only (least privilege); просьбы «поправь заодно» → отказ + передача в build-контур.
+- **Outputs:** markdown-отчёт ревью: находки с серьёзностью и цитатами строк, вердикт по done, строка `EDT tooling:` (read-инструменты), пометка «запись в конфигурацию не выполнялась».
+- **Design notes:** кросс-ревью вторым агентом — ревьюер другая сессия, чем строитель (практика SteelMorgan через `bmad-code-review`); Analysis Only включается на стороне EDT-MCP (toolsets/preset) самим пользователем/конфигурацией, скилл только проверяет видимость; требует `e1c-core`.
+- **Relationships:** рубрика ссылается на `e1c-bsl-practices`/`e1c-metadata-forms` как нормативку без дублирования.
+
 ## Configuration
 
 Модуль требует минимума собственной конфигурации; параметры проекта живут в `.dev.env` проекта (единый источник правды, унаследованная конвенция):
@@ -162,13 +174,14 @@ Setup-скилл делает больше записи конфига:
 3. **e1c-bsl-practices** — самая частая работа (T1-конвертация основного объёма).
 4. **e1c-metadata-forms** — вторая по частоте; переиспользует гейты ядра.
 5. **e1c-testing-yaxunit** — замыкает определение «зелёного».
-6. **e1c-updater** — можно собирать последним: до него обновление вручную по инструкции из setup.
+6. **e1c-review** — 1С-линза ревью (Analysis Only); закрывает петлю build→review.
+7. **e1c-updater** — можно собирать последним: до него обновление вручную по инструкции из setup.
 
 После сборки скиллов — Create Module (CM): скелет модуля, config-переменные, module.yaml, установка как expansion `bmm`.
 
 ## Creative Use Cases
 
-Not ready — complete in Phase 7 (если останется время до финализации).
+Рассмотрено и осознанно отложено: модуль — инфраструктурный слой стека, «креативные» сценарии не входят в MVP. Заделы на будущее (не обещания): 1С-разведка перед PRD (read-only обход конфигурации через MCP для фактологии архитектуры), автоотчёт «дельта конфигурации» по сторям, генерация каркаса объектов из спеки. Добавляются пост-MVP как новые скиллы без изменения ядра.
 
 ## Ideas Captured
 
@@ -287,7 +300,3 @@ Not ready — complete in Phase 7 (если останется время до �
 **Гейты:** текст ИБ-gate → `USER-RULES.md`, маркер `IB_UPDATE_CHANNEL=edt-only` (Q4: исполнитель — setup-скилл, формулировка открыта).
 
 **Бэклог реализации:** T1 конвертация подмножества ai_rules_1c (база сверки `comol/ai_rules_1c@e59525d042c1`, 2026-08-24), T2 гейт+updater EDT-MCP, T3 блок стека + setup.
-
-## Build Roadmap
-
-Not ready — complete in Phase 3+
