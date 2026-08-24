@@ -1,0 +1,16 @@
+code: e1c
+name: "1C EDT"
+description: "Правила работы с 1С в BMAD через EDT-MCP: читать и менять конфигурацию только через MCP, считать работу сделанной по зелёному EDT."
+module_version: 0.1.0
+default_selected: false
+module_greeting: >
+  Модуль 1C EDT подключён. Контур работы: прочитал MCP → записал MCP → EDT зелёный.
+  Установка стека в проект — скилл e1c-setup; ядро правил — e1c-core (грузить вместе с любым e1c-*);
+  доменные правила — e1c-bsl-practices, e1c-metadata-forms, e1c-testing-yaxunit;
+  ревью на чтение — e1c-review; обновление пакета правил — e1c-updater.
+edt_mcp_min_version:
+  prompt: "Минимально поддерживаемый тег релиза EDT-MCP для гейта версии (e1c-core)?"
+  default: "v2.15.1"
+rules_lang:
+  prompt: "Ветка правил пакета EDT-MCP: ru или en?"
+  default: "ru"
