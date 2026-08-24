@@ -1,0 +1,25 @@
+# BMad installer output — среда разработки модуля, не исходники
+.agents/
+_bmad/
+_bmad-output/
+
+# Python
+__pycache__/
+.pytest_cache/
+*.pyc
+.venv/
+venv/
+
+# Secrets
+.env
+.env.*
+
+# Node
+node_modules/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+*.swp
+.idea/
+.vscode/
